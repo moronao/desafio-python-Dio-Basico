@@ -1,4 +1,5 @@
 import textwrap
+import datetime
 
 
 def menu():
@@ -16,39 +17,28 @@ def menu():
 
 
 def depositar(saldo, valor, extrato, /):
-    if valor > 0:
-        saldo += valor
-        extrato += f"Depósito:\tR$ {valor:.2f}\n"
-        print("\n=== Depósito realizado com sucesso! ===")
+    if valor < 0:
+        input(
+            "Valor invalido! \nPor favor digite um Valor Numerico Positivo\n Pressione qualquer tecla para continuar \n")
     else:
-        print("\nOperação falhou! O valor informado é inválido.")
-
+        saldo += valor
+        extrato += (f"Deposito no Valor de R$ {valor: .2f} na data {datetime.date.today()}\n")
+        input(f"""Deposito Efetuado com Sucesso Seu Novo Saldo é de RS {saldo:.2f} A  perte qualquer tecla para continuar\n""")
     return saldo, extrato
 
 
-def sacar(*, saldo, valor, extrato, limite, numero_saques, limite_saques):
-    excedeu_saldo = valor > saldo
-    excedeu_limite = valor > limite
-    excedeu_saques = numero_saques >= limite_saques
-
-    if excedeu_saldo:
-        print("\n Operação falhou! Você não tem saldo suficiente. ")
-
-    elif excedeu_limite:
-        print("\n Operação falhou! O valor do saque excede o limite. ")
-
-    elif excedeu_saques:
-        print("\n Operação falhou! Número máximo de saques excedido. ")
-
-    elif valor > 0:
-        saldo -= valor
-        extrato += f"Saque:\t\tR$ {valor:.2f}\n"
-        numero_saques += 1
-        print("\n=== Saque realizado com sucesso! ===")
-
+def sacar(*, saldo, valor, extrato, limite, limite_saques):
+    if limite_saques == 0:
+        input("Limite de saques diarios esgotado, Saque disponivel no proximo dia \nAperte qualquer tecla para continuar \n")
+    elif valor > saldo:
+        input("Saque nao pode ser efetuado, Saldo insuficiente\nAperte qualquer tecla para continuar\n")
+    elif valor > limite:
+        input("Saque nao pode ser efetuado, Saque Maior que Limite de Saque\nAperte qualquer tecla para continuar\n")
     else:
-        print("\n Operação falhou! O valor informado é inválido. ")
-
+        saldo -= valor
+        limite_saques -= 1
+        extrato += (f"Saque no Valor de R$ {valor: .2f} na data {datetime.date.today()}\n")
+        input(f"Saque efetuado com Sucesso! \nSeu Novo Saldo é de RS {saldo:.2f} \nAperte qualquer tecla para continuar \n")
     return saldo, extrato
 
 
@@ -64,7 +54,7 @@ def criar_usuario(usuarios):
     usuario = filtrar_usuario(cpf, usuarios)
 
     if usuario:
-        print("\n Já existe usuário com esse CPF! ")
+        print("\n@@@ Já existe usuário com esse CPF! @@@")
         return
 
     nome = input("Informe o nome completo: ")
@@ -89,7 +79,7 @@ def criar_conta(agencia, numero_conta, usuarios):
         print("\n=== Conta criada com sucesso! ===")
         return {"agencia": agencia, "numero_conta": numero_conta, "usuario": usuario}
 
-    print("\n Usuário não encontrado, fluxo de criação de conta encerrado! ")
+    print("\n@@@ Usuário não encontrado, fluxo de criação de conta encerrado! @@@")
 
 
 def listar_contas(contas):
@@ -130,7 +120,6 @@ def main():
                 valor=valor,
                 extrato=extrato,
                 limite=limite,
-                numero_saques=numero_saques,
                 limite_saques=LIMITE_SAQUES,
             )
 
